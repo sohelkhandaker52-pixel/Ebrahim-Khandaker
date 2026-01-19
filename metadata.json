@@ -1,0 +1,5 @@
+{
+  "name": "EKS courier service",
+  "description": "A comprehensive and modern courier management dashboard with real-time balance tracking, parcel management, Excel reporting, and a Gemini-powered smart assistant.",
+  "requestFramePermissions": []
+}
