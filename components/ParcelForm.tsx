@@ -1,7 +1,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Parcel, UserProfile } from '../types';
-import { MapPin, Phone, User, DollarSign, Weight, FileText, Repeat, Send, RefreshCcw, Info, AlertCircle, Printer, CheckCircle, ArrowLeft, QrCode, Barcode as BarcodeIcon, Package, Hash } from 'lucide-react';
+/* Added missing 'Plus' icon to imports */
+import { MapPin, Phone, User, DollarSign, Weight, FileText, Repeat, Send, RefreshCcw, Info, AlertCircle, Printer, CheckCircle, ArrowLeft, QrCode, Barcode as BarcodeIcon, Package, Hash, Plus } from 'lucide-react';
 import ShippingLabel from './ShippingLabel';
 
 interface ParcelFormProps {

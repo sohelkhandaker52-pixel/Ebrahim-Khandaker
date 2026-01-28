@@ -10,6 +10,7 @@ import PaymentInvoice from './PaymentInvoice';
 import Profile from './Profile';
 import TopUp from './TopUp';
 import PickupRequest from './PickupRequest';
+import NotificationView from './NotificationView';
 import Auth, { EksoLogo } from './Auth';
 import { Download, Plus, LayoutDashboard, Package, MessageSquare, CreditCard, Menu, X, Settings, User, ShieldAlert, Ticket, Truck, Globe, ChevronDown, Store, Wallet, Lightbulb, Eye, EyeOff, FileSpreadsheet, Smartphone, Search, Bell, Home, LogOut, List, Navigation } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -201,7 +202,7 @@ const App: React.FC = () => {
       trackingHistory: [
         {
           status: 'Order Placed',
-          location: user.address || 'Pickup Point',
+          location: user.address || 'Merchant Location',
           timestamp: new Date().toISOString(),
           handlerName: user.name,
           handlerPhone: user.phone,
@@ -218,7 +219,21 @@ const App: React.FC = () => {
   };
 
   const updateStatus = (id: string, status: Parcel['status']) => {
-    setParcels(prev => prev.map(p => p.id === id ? { ...p, status } : p));
+    const newStep: TrackingStep = {
+        status: status,
+        location: 'Central Distribution Hub',
+        timestamp: new Date().toISOString(),
+        handlerName: 'EKS Ops Hub',
+        handlerPhone: '01XXXXXXXXX',
+        hubPhone: '01XXXXXXXXX',
+        description: `আপনার পার্সেলের স্ট্যাটাস এখন ${status} হিসেবে আপডেট করা হয়েছে।`
+    };
+
+    setParcels(prev => prev.map(p => p.id === id ? { 
+        ...p, 
+        status, 
+        trackingHistory: [...p.trackingHistory, newStep] 
+    } : p));
     
     // Auto balance logic: if delivered, add net amount (simplification for prototype)
     if (status === 'Delivered') {
@@ -255,7 +270,7 @@ const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex bg-[#f8fafc] ${isRtl ? 'font-arabic' : ''}`}>
-      <aside className={`hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 p-5 fixed inset-y-0 shadow-sm z-30 ${isRtl ? 'right-0 border-l border-r-0' : 'left-0'}`}>
+      <aside className={`hidden lg:flex flex-col w-64 bg-white border-r border-gray-100 p-5 fixed inset-y-0 shadow-sm z-30 ${isRtl ? 'right-0 border-l border-r-0' : 'left-0'}`}>
         <div className="mb-4 mt-2 overflow-hidden flex justify-start" onClick={() => setActiveTab('dashboard')}>
           <EksoLogo scale={0.6} />
         </div>
@@ -316,8 +331,11 @@ const App: React.FC = () => {
                 className={`w-full ${isRtl ? 'pr-10 pl-4 text-right' : 'pl-10 pr-4 text-left'} py-2 bg-gray-50 border border-gray-100 rounded-full focus:bg-white focus:border-[#00a651] outline-none text-xs font-bold transition-all`} 
               />
             </div>
+             <button onClick={() => setActiveTab('notification')} className="p-2.5 bg-gray-50 rounded-xl text-gray-600 hover:text-[#00a651] transition-colors relative">
+               <Bell size={20} />
+               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full"></span>
+             </button>
              <button onClick={() => setShowBalance(!showBalance)} className="p-2.5 bg-gray-50 rounded-xl text-gray-600 hover:text-[#00a651] transition-colors"><Wallet size={20} /></button>
-             <button onClick={() => setIsLangOpen(!isLangOpen)} className="p-2.5 bg-gray-50 rounded-xl text-gray-600 hover:text-[#00a651] transition-colors"><Globe size={20} /></button>
           </div>
         </header>
 
@@ -328,6 +346,8 @@ const App: React.FC = () => {
           {activeTab === 'add' && <ParcelForm onSubmit={addParcel} t={t} merchant={user} />}
           {activeTab === 'assistant' && <Assistant t={t} />}
           {activeTab === 'advice' && <Advice t={t} />}
+          {activeTab === 'notification' && <NotificationView parcels={parcels} t={t} onNavigateToParcel={(id) => { setGlobalSearchTerm(id); setActiveTab('parcels'); }} />}
+          {activeTab === 'payments' && <PaymentInvoice parcels={parcels} paymentMethods={paymentMethods} onSaveMethod={() => {}} onDeleteMethod={() => {}} t={t} />}
         </div>
         
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} t={t} />
